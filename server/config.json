@@ -1,0 +1,11 @@
+{
+  "upload_folder": "./",
+  "timeoutHours": 1,
+  "mongo_connection": "mongodb://127.0.0.1/fuckmovies",
+  "credentials": {
+    "openload": {
+      "api_login": "cbb0d6c21a626ba8",
+      "api_key": "Te2ITbTR"
+    }
+  }
+}
