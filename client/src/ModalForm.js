@@ -34,10 +34,22 @@ class ModalForm extends React.Component {
         this.setState({ ['form_' + target.id]: target.value });
     }
 
+    componentWillReceiveProps(nextProps) {
+        if(nextProps.itemVideo.id !== this.props.itemVideo.id){
+            this.setState({
+                form_idimdb: nextProps.itemVideo.idimdb,
+                form_title: nextProps.itemVideo.title,
+                form_links: nextProps.itemVideo.embeds.map(e=>e.embed_url).join('\n'),
+            });
+        }
+        return true;
+    }
+
     handleSubmit = () => {
         this.setState({ loading: true });
-        fetch(API_VIDEO, {
-            method: 'POST',
+        const urlVideo = API_VIDEO + '/' + (this.props.itemVideo.id || '');
+        fetch(urlVideo, {
+            method: this.props.itemVideo.id ? 'PUT' : 'POST',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
@@ -52,9 +64,11 @@ class ModalForm extends React.Component {
                 console.log('json', json);
                 
                 this.fetchLinks = []
-                this.state.form_links.split('\n').forEach(link=>{
-                    this.fetchLinks.push(fetch(API_EMBED, {
-                        method: 'POST',
+                this.state.form_links.split('\n').forEach((link, i)=>{
+                    let urlEmbed = API_EMBED + '/' + (this.props.itemVideo.id ? this.props.itemVideo.embeds[i]._id : '');
+                    console.log('embed url=>',urlEmbed);
+                    this.fetchLinks.push(fetch(urlEmbed, {
+                        method: this.props.itemVideo.id ? 'PUT' : 'POST',
                         headers: {
                             'Accept': 'application/json',
                             'Content-Type': 'application/json'
@@ -88,7 +102,9 @@ class ModalForm extends React.Component {
                 aria-labelledby="form-dialog-title"
             >
                 <div style={{ position: 'relative' }}>
-                    <DialogTitle id="form-dialog-title">Agregar</DialogTitle>
+                    <DialogTitle id="form-dialog-title">
+                        {this.props.itemVideo.id ? 'Editar': 'Agregar'}
+                    </DialogTitle>
                     <DialogContent>
                         <DialogContentText>
                             Por cada Link que se agregue ponga un salto de linea de separación.
@@ -104,7 +120,7 @@ class ModalForm extends React.Component {
                                     fullWidth
                                     variant='outlined'
                                     onChange={this.changeInput}
-                                    value={this.state['form_idimdb']}
+                                    value={this.state.form_idimdb}
                                 />
                             </Grid>
                             <Grid item xs={8}>
@@ -116,7 +132,7 @@ class ModalForm extends React.Component {
                                     fullWidth
                                     variant='outlined'
                                     onChange={this.changeInput}
-                                    value={this.state.title}
+                                    value={this.state.form_title}
                                 />
                             </Grid>
                         </Grid>
@@ -132,7 +148,7 @@ class ModalForm extends React.Component {
                                 fullWidth
                                 variant='outlined'
                                 onChange={this.changeInput}
-                                value={this.state.links}
+                                value={this.state.form_links}
                             />
                         </Grid>
                     </DialogContent>
@@ -141,7 +157,7 @@ class ModalForm extends React.Component {
                             Cancelar
                             </Button>
                         <Button onClick={this.handleSubmit} color="primary">
-                            Agregar
+                            {this.props.itemVideo.id ? 'Editar' : 'Agregar'}
                             </Button>
                     </DialogActions>
                     {this.state.loading && (

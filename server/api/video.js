@@ -7,7 +7,7 @@ const router = Router();
 
 router.get('/', async (req, res) => {
     try{
-        const data = await Video.find({}).sort('-created').limit(20);
+        const data = await Video.find({}).populate('embeds', 'embed_url').sort('-created').limit(20);
         return res.json({error:false, message:'ok', data});
     }catch(e){
         console.log('err', e);
@@ -37,7 +37,29 @@ router.get('/:id', VideoId, (req, res) => {
 });
 
 router.put('/:id', VideoId, (req, res) => {
-    //in progress
+    console.log('update', req.body);
+    console.log('video', req.video);
+    const {title, idimdb, source} = req.body;
+    const id = req.params.id;
+    
+    if(!title)
+        return res.status(403).json({error:true, message:'name is required'});
+    
+    Video
+        .findOne({id})
+        .then((video) => {
+            video.title = title;
+            video.idimdb = idimdb;
+            video.source = source
+            video
+                .save()
+                .then(() => {
+                    res.jsonp({ error: false, message:'successfull', data:video });
+                })
+                .catch((e)=>{
+                    console.log('error update', e);
+                });
+        });
 });
 
 router.delete('/:id', VideoId, (req, res) => {

@@ -11,6 +11,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
+import { URL_PLAYER } from './config';
 
 const styles = theme => ({
     root: {
@@ -39,6 +40,8 @@ class SimpleTable extends React.Component {
         anchorEl: null,
     };
 
+    itemVideo = {};
+
     handleClick = event => {
         this.setState({ anchorEl: event.currentTarget });
     };
@@ -46,6 +49,15 @@ class SimpleTable extends React.Component {
     handleClose = () => {
         this.setState({ anchorEl: null });
     };
+
+    handleEdit = () => {
+        this.props.updateItem(this.itemVideo);
+        this.handleClose();
+    }
+    handlePreview = () => {
+        window.location.href = URL_PLAYER + '/' + this.itemVideo.idimdb;
+        this.handleClose();
+    }
 
     render() {
         const { classes } = this.props;
@@ -56,7 +68,7 @@ class SimpleTable extends React.Component {
                         <TableRow>
                             <TableCell numeric>Imdb</TableCell>
                             <TableCell>Titulo</TableCell>
-                            <TableCell numeric>Total</TableCell>
+                            <TableCell numeric>Links</TableCell>
                             <TableCell>Acción</TableCell>
     
                         </TableRow>
@@ -64,7 +76,7 @@ class SimpleTable extends React.Component {
                     <TableBody>
                         {this.props.items.map((item,i) => {
                             return (
-                                <TableRow key={item.id}>
+                                <TableRow key={i}>
                                     <TableCell numeric>{item.idimdb}</TableCell>
                                     <TableCell component="th" scope="row">
                                         {item.title}
@@ -75,7 +87,10 @@ class SimpleTable extends React.Component {
                                             aria-label="More"
                                             aria-owns={this.state.anchorEl ? 'menu' : null}
                                             aria-haspopup="true"
-                                            onClick={this.handleClick}
+                                            onClick={e=>{
+                                                this.itemVideo = item;
+                                                this.handleClick(e);
+                                            }}
                                         >
                                             <MoreVertIcon />
                                         </IconButton>
@@ -91,8 +106,8 @@ class SimpleTable extends React.Component {
                     open={Boolean(this.state.anchorEl)}
                     onClose={this.handleClose}
                 >
-                    <MenuItem className={classes.menu} onClick={this.handleClose}>Edit</MenuItem>
-                    <MenuItem className={classes.menu} onClick={this.handleClose}>Preview</MenuItem>
+                    <MenuItem className={classes.menu} onClick={this.handleEdit}>Edit</MenuItem>
+                    <MenuItem className={classes.menu} onClick={this.handlePreview}>Preview</MenuItem>
                     <MenuItem className={classes.menu} onClick={this.handleClose}>Delete</MenuItem>
                 </Menu>
             </Paper>

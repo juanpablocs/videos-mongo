@@ -35,4 +35,32 @@ router.post('/', async (req, res) => {
     }
 });
 
+
+router.put('/:id', async (req, res) => {
+    const {id_video, server, embed_id, embed_url, status} = req.body;
+    const id = req.params.id;
+    try{
+        const video = await Video.findOne({id: id_video});
+        if(!video)
+            return res.status(403).json({error:true, message:'video not exist'});
+        
+            Embed
+            .findOne({_id: id})
+            .then((embed) => {
+                embed.embed_url = embed_url;
+                embed
+                    .save()
+                    .then(() => {
+                        res.jsonp({ error: false, message:'edited successfull', embed });
+                    })
+                    .catch((e)=>{
+                        console.log('error update', e);
+                        res.status(403).json({error:true, 'message':'error to embed'})
+                    });
+            });
+    }catch(e) {
+        res.status(403).json({error:true, message:'error to update embed', data:e.message});
+    }
+});
+
 module.exports = router;

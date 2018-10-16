@@ -25,7 +25,7 @@ const styles = theme => ({
   },
   fab: {
     position: 'absolute',
-    right: '15px',
+    right: '10px',
     bottom: ' -50px'
   }
 });
@@ -35,7 +35,8 @@ class App extends Component {
   state = {
     open: false,
     countItems: 0,
-    listVideos: []
+    listVideos: [],
+    itemVideo:{id:null, embeds:[]}
   };
 
   componentDidMount() {
@@ -43,7 +44,7 @@ class App extends Component {
   }
 
   handleOpen = () => {
-    this.setState({ open: true });
+    this.setState({ open: true, itemVideo: {id:null, embeds:[]} });
   };
 
   handleClose = () => {
@@ -54,17 +55,22 @@ class App extends Component {
     this.fetchItems();
   }
 
+  updateItem = (item) => {
+    console.log(item);
+    this.setState({open:true, itemVideo:item});
+  }
+
   render() {
     const {classes} = this.props;
     return (
       <div className={classes.root}>
         <Grid className={classes.grid} item xs={8}>
-          <TableList items={this.state.listVideos} />
+          <TableList updateItem={this.updateItem} items={this.state.listVideos} />
           <p> Items {this.state.countItems} </p>
           <Button onClick={this.handleOpen} variant="fab" className={classes.fab} color='primary'>
               <AddIcon />
           </Button> 
-          <ModalForm updateList={this.updateList} open={this.state.open} handleClose={this.handleClose} />
+          <ModalForm itemVideo={this.state.itemVideo} updateList={this.updateList} open={this.state.open} handleClose={this.handleClose} />
         </Grid>
       </div>
     );
