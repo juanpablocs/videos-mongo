@@ -5,7 +5,7 @@ const { PlayerEmbed } = require('./play');
 
 const { Database } = require('./api/middlewares');
 const app = express();
-const port = 3001;
+const port = 8080;
 app.use(cors());
 app.set('view engine', 'ejs');
 app.use(express.json());
